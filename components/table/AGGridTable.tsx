@@ -3,7 +3,6 @@
 import Constants from '@/const';
 import { Entity, Order, TableProps } from '@/types';
 import {
-  ColDef,
   IServerSideDatasource,
   IServerSideGetRowsParams,
   SortModelItem,
@@ -96,9 +95,6 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
     [columns]
   );
 
-  // Align cells values to te left by default
-  const defaultColDef: ColDef = { cellClass: 'text-left' };
-
   return (
     <div className="ag-theme-quartz-auto-dark w-full h-full">
       <AgGridReact<T>
@@ -106,8 +102,6 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
         serverSideDatasource={serverSideDatasource}
         cacheBlockSize={pageSize}
         getRowId={(row) => row.data.id}
-        maxConcurrentDatasourceRequests={1}
-        blockLoadDebounceMillis={300}
         ref={agGridRef} // Ref for accessing Grid's API
         columnDefs={columns}
         animateRows
@@ -121,7 +115,6 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
         onRowValueChanged={(params) => {
           onRowValueChanged && onRowValueChanged(params);
         }}
-        defaultColDef={defaultColDef}
       />
     </div>
   );

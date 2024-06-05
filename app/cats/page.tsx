@@ -52,7 +52,7 @@ export default function CatsTablePage() {
     agGridRef,
     tableDataLoader: getCatsPage,
     defaultOrder: 'DESC',
-    pageSize: 10,
+    pageSize: 25,
   };
 
   const updateData = () => {

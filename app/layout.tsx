@@ -24,7 +24,7 @@ export default function RootLayout({
               Cats Table with selectable cells
             </h1>
           </div>
-          <div className="text-center justify-center grow flex flex-col w-full">
+          <div className="justify-center grow flex flex-col w-full">
             {children}
           </div>
         </main>
