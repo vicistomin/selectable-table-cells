@@ -1,40 +1,58 @@
 'use client';
 
+import { getCatsPage } from '@/api/cats';
 import AGGridTable from '@/components/table/AGGridTable';
-import { Entity, TableColumn, TableLoader } from '@/types';
+import { Breed, Cat, Handler, TableColumn, TableProps } from '@/types';
+import { ICellRendererParams, ValueGetterFunc } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRef } from 'react';
 
-export type Cat = Entity & { title: string };
+const DEFAULT_VALUE = 'n/a';
 
 export default function CatsTablePage() {
+  // const
   const agGridRef = useRef<AgGridReact>(null);
+
+  // Helper method to extract Breed info from the Cat object. Always using only 1st breed
+  const getBreedFieldValue =
+    (field: keyof Breed): ValueGetterFunc<Cat> =>
+    (row) =>
+      row.data?.breeds?.[0]?.[field] ?? DEFAULT_VALUE;
+
+  const imageRenderer: Handler<ICellRendererParams> = (row) =>
+    row.data.url ? (
+      <Image width={40} height={40} src={row.data.url} alt={row.data.id} />
+    ) : (
+      DEFAULT_VALUE
+    );
 
   const columns: TableColumn<Cat>[] = [
     {
       field: 'id',
     },
     {
-      field: 'title',
+      headerName: 'Photo',
+      cellRenderer: imageRenderer,
+    },
+    {
+      headerName: 'Breed Name',
+      valueGetter: getBreedFieldValue('name'),
+    },
+    {
+      headerName: 'Breed Description',
+      valueGetter: getBreedFieldValue('description'),
     },
   ];
 
-  const tableDataLoader: TableLoader<Cat> = (pageQuery) => {
-    console.log('new API request', { pageQuery });
-    return Promise.resolve([
-      { id: 1, title: 'test' + Math.floor(Math.random() * 10) },
-      { id: 2, title: 'test' + Math.floor(Math.random() * 10) },
-      { id: 3, title: 'test' + Math.floor(Math.random() * 10) },
-    ]);
-  };
-
-  const tableProps = {
+  const tableProps: TableProps<Cat> = {
     tableName: 'cats',
     columns,
     agGridRef,
-    tableDataLoader,
-    // catsApi.getAll(pageQuery.page, pageQuery.size),
+    tableDataLoader: getCatsPage,
+    defaultOrder: 'DESC',
+    pageSize: 10,
   };
 
   const updateData = () => {

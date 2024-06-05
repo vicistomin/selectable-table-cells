@@ -3,6 +3,7 @@
 import Constants from '@/const';
 import { Entity, Order, TableProps } from '@/types';
 import {
+  ColDef,
   IServerSideDatasource,
   IServerSideGetRowsParams,
   SortModelItem,
@@ -27,7 +28,7 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
     columns,
     agGridRef,
     pageSize = Constants.PageSize.DEFAULT,
-    defaultOrder = Constants.Order.DEFAULT,
+    defaultOrder = Constants.Order.DEFAULT as Order,
     onRowValueChanged,
   } = props;
   // Method that returns the getRows callback for the AG Grid ServerSide Store
@@ -37,19 +38,19 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
 
     agGridRef.current?.api.hideOverlay();
 
-    // Using data from AG Grid request to calculate current page size
-    const newPageSize = params.request.endRow
-      ? params.request.endRow - (params.request?.startRow || 0)
-      : pageSize;
+    const newPageSize: number =
+      pageSize && pageSize <= Constants.PageSize.MAX_PAGE_SIZE
+        ? pageSize
+        : Constants.PageSize.DEFAULT;
 
     // define the new Page request params
     const newPage: number = Math.floor(
-      (params.request.startRow || 0) / newPageSize
+      (params.request.startRow || 0) / pageSize
     );
 
     // Sending only first column sort mode for the request with multi-level sorting
     const newSortingParams: Array<SortModelItem> = params.request.sortModel;
-    const newSort =
+    const newSort: Order =
       newSortingParams.length > 0
         ? (newSortingParams[0].sort.toUpperCase() as Order)
         : defaultOrder;
@@ -95,11 +96,15 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
     [columns]
   );
 
+  // Align cells values to te left by default
+  const defaultColDef: ColDef = { cellClass: 'text-left' };
+
   return (
     <div className="ag-theme-quartz-auto-dark w-full h-full">
       <AgGridReact<T>
         rowModelType="serverSide"
         serverSideDatasource={serverSideDatasource}
+        cacheBlockSize={pageSize}
         getRowId={(row) => row.data.id}
         maxConcurrentDatasourceRequests={1}
         blockLoadDebounceMillis={300}
@@ -116,6 +121,7 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
         onRowValueChanged={(params) => {
           onRowValueChanged && onRowValueChanged(params);
         }}
+        defaultColDef={defaultColDef}
       />
     </div>
   );

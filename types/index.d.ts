@@ -10,7 +10,6 @@ export type Entity = {
   id: ID;
 };
 
-export type PageSize = (typeof Constants.PageSize.OPTIONS)[number];
 export type Order = (typeof Constants.Order.OPTIONS)[number];
 
 export type PageQueryParams = {
@@ -21,7 +20,7 @@ export type PageQueryParams = {
   /**
    * Page size
    */
-  limit: PageSize;
+  limit: number;
   /**
    * Sort by creation date
    */
@@ -57,3 +56,53 @@ export interface TableProps<T extends Entity> {
   // Optional handler for performing custom additional actions after the row value was changed during in-line editing
   onRowValueChanged?: Handler<RowValueChangedEvent<T>>;
 }
+
+export type Breed = Entity & {
+  name: string;
+  description: string;
+  alt_names: string;
+  temperament: string;
+  origin: string;
+  // Ranges as string
+  life_span: string;
+  country_code: string;
+  country_codes: string;
+  reference_image_id: string;
+  // Weight ranges as strings
+  weight: { imperial: string; metric: string };
+  // Links
+  vcahospitals_url: string;
+  vetstreet_url: string;
+  wikipedia_url: string;
+  cfa_url: string;
+  // Numerical data
+  adaptability: number;
+  affection_level: 5;
+  child_friendly: number;
+  dog_friendly: number;
+  energy_level: number;
+  experimental: number;
+  grooming: number;
+  hairless: number;
+  health_issues: number;
+  hypoallergenic: number;
+  indoor: number;
+  intelligence: number;
+  natural: number;
+  rare: number;
+  rex: number;
+  shedding_level: number;
+  short_legs: number;
+  social_needs: number;
+  stranger_friendly: number;
+  suppressed_tail: number;
+  vocalisation: number;
+};
+
+export type Cat = Entity & {
+  breeds: Breed[];
+  // Image metadata
+  url: string;
+  width: number;
+  height: number;
+};
