@@ -33,15 +33,8 @@ export type TableLoader<T extends Entity> = (
   pageQuery: PageQueryParams
 ) => Promise<T[]>;
 
-export type TableColumn<T extends Entity> = {
-  type?: AutoFormatType | Array<string>;
-  renderer?: CellRenderer<T>;
-  defaultValue?: string;
-  format?: string;
-} & ColDef<T>;
-
 export interface TableProps<T extends Entity> {
-  columns: TableColumn<T>[];
+  columns: ColDef<T>[];
   tableName: string;
   // Required method to connect the AG Grid with certain server API endpoint to load table data
   tableDataLoader: TableLoader<T>;

@@ -3,6 +3,7 @@
 import Constants from '@/const';
 import { Entity, Order, TableProps } from '@/types';
 import {
+  ColDef,
   IServerSideDatasource,
   IServerSideGetRowsParams,
   SortModelItem,
@@ -95,6 +96,11 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
     [columns]
   );
 
+  const defaultColDef: ColDef<T> = {
+    // Sorting is disabled by default
+    sortable: false,
+  };
+
   return (
     <div className="ag-theme-quartz-auto-dark w-full h-full">
       <AgGridReact<T>
@@ -115,6 +121,7 @@ const AGGridTable = <T extends Entity>(props: TableProps<T>): ReactNode => {
         onRowValueChanged={(params) => {
           onRowValueChanged && onRowValueChanged(params);
         }}
+        defaultColDef={defaultColDef}
       />
     </div>
   );

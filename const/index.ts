@@ -4,7 +4,7 @@ const PageSize = {
 };
 
 const Order = {
-  DEFAULT: 'RANDOM',
+  DEFAULT: 'DESC',
   OPTIONS: ['ASC', 'DESC', 'RANDOM'] as const,
 };
 

@@ -2,9 +2,14 @@
 
 import { getCatsPage } from '@/api/cats';
 import AGGridTable from '@/components/table/AGGridTable';
-import { Breed, Cat, Handler, TableColumn, TableProps } from '@/types';
-import { ICellRendererParams, ValueGetterFunc } from 'ag-grid-community';
+import { Breed, Cat, Handler, TableProps } from '@/types';
+import {
+  ColDef,
+  ICellRendererParams,
+  ValueGetterFunc,
+} from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
+import { randomCatName } from 'cat-names';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef } from 'react';
@@ -18,31 +23,74 @@ export default function CatsTablePage() {
   // Helper method to extract Breed info from the Cat object. Always using only 1st breed
   const getBreedFieldValue =
     (field: keyof Breed): ValueGetterFunc<Cat> =>
-    (row) =>
-      row.data?.breeds?.[0]?.[field] ?? DEFAULT_VALUE;
+    (row) => {
+      if (field === 'weight')
+        return row.data?.breeds?.[0]?.weight?.metric ?? DEFAULT_VALUE;
+      else return row.data?.breeds?.[0]?.[field] ?? DEFAULT_VALUE;
+    };
 
   const imageRenderer: Handler<ICellRendererParams> = (row) =>
     row.data.url ? (
-      <Image width={40} height={40} src={row.data.url} alt={row.data.id} />
+      <div className="flex items-center h-full">
+        <Image width={40} height={40} src={row.data.url} alt={row.data.id} />
+      </div>
     ) : (
       DEFAULT_VALUE
     );
 
-  const columns: TableColumn<Cat>[] = [
+  const columns: ColDef<Cat>[] = [
     {
       field: 'id',
+      width: 120,
+      sortable: true,
     },
     {
       headerName: 'Photo',
       cellRenderer: imageRenderer,
+      width: 100,
     },
     {
-      headerName: 'Breed Name',
+      headerName: 'Name',
+      valueGetter: () => randomCatName(),
+      width: 120,
+    },
+    {
+      headerName: 'Breed',
       valueGetter: getBreedFieldValue('name'),
+      width: 150,
     },
     {
-      headerName: 'Breed Description',
+      headerName: 'First visit?',
+      cellRenderer: () => (Math.random() > 0.5 ? 'Yes' : 'No'),
+      width: 150,
+    },
+    {
+      headerName: 'Vaccinated?',
+      cellRenderer: () => (Math.random() > 0.5 ? 'Yes' : 'No'),
+      width: 150,
+    },
+    // TODO: Make values selectable
+    {
+      headerName: 'Age',
+      valueGetter: getBreedFieldValue('life_span'),
+      width: 100,
+    },
+    // TODO: Make values selectable
+    {
+      headerName: 'Weight, kg',
+      valueGetter: getBreedFieldValue('weight'),
+      width: 120,
+    },
+    // TODO: Make values selectable
+    {
+      headerName: 'Country',
+      valueGetter: getBreedFieldValue('origin'),
+      width: 150,
+    },
+    {
+      headerName: 'Description',
       valueGetter: getBreedFieldValue('description'),
+      width: 300,
     },
   ];
 
@@ -51,7 +99,6 @@ export default function CatsTablePage() {
     columns,
     agGridRef,
     tableDataLoader: getCatsPage,
-    defaultOrder: 'DESC',
     pageSize: 25,
   };
 
